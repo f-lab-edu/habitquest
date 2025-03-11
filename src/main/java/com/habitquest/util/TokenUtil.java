@@ -98,7 +98,6 @@ public class TokenUtil {
           .parseSignedClaims(token)// jwt를 해석해서 내부 정보를 가져옴. 만료 시간도 함께 체크함
           .getPayload(); // 검증 성공시 jwt payload를 claims 형태로 리턴
     } catch (Exception e) {
-      e.printStackTrace();
       throw new HabitQuestException(ErrorType.USER_UNAUTHORIZED);
     }
   }
