@@ -35,6 +35,7 @@ public class SecurityConfig {
             .requestMatchers(
                 "api/v1/auth/login",
                 "api/v1/auth/login/**",
+                "api/v1/user/check-username",
                 "/swagger-ui/**",
                 "/v3/api-docs/**"
             ).permitAll()  // ✅ 특정 엔드포인트만 공개

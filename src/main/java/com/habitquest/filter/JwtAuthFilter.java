@@ -30,12 +30,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
   @Override
   protected boolean shouldNotFilter(HttpServletRequest request) {
     AntPathMatcher pathMatcher = new AntPathMatcher();
-    String[] excloudePath = {"/api/v1/auth/login",
-        "/api/v1/auth/login/**",
+    String[] excloudePath = {"api/v1/auth/login",
+        "api/v1/auth/login/**",
+        "api/v1/user/check-username",
         "/swagger-ui/**",
-        "/v3/api-docs/**",
-        "/swagger-resources/**",
-        "/webjars/**"};
+        "/v3/api-docs/**"};
     String path = request.getRequestURI();
     return Arrays.stream(excloudePath).anyMatch(exclude -> pathMatcher.match(exclude, path));
 
