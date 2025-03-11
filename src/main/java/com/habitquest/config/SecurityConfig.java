@@ -25,21 +25,6 @@ public class SecurityConfig {
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
   }
-
-//  @Bean
-//  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//    http
-//        .authorizeHttpRequests(auth -> auth
-//            .anyRequest().permitAll() // 모든 요청 허용
-//        )
-//        .csrf(csrf -> csrf.disable()) // CSRF 비활성화 (필요 시)
-//        .formLogin(form -> form.disable()) // 폼 로그인 비활성화
-//        .httpBasic(httpBasic -> httpBasic.disable()); // HTTP Basic 비활성화
-//
-//    return http.build();
-//  }
-
-
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     return http
