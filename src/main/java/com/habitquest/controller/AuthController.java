@@ -7,12 +7,11 @@ import com.habitquest.service.dto.LoginRequestDTO;
 import com.habitquest.service.dto.SSORequestDTO;
 import com.habitquest.common.Provider;
 import com.habitquest.service.dto.TokenResponseDTO;
-import com.habitquest.util.TokenUtil;
+import com.habitquest.service.TokenService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,7 +30,7 @@ public class AuthController {
 
   private final AuthService authService;
   private final TakeSSOProvider takeSSOProvider;
-  private final TokenUtil tokenUtil;
+  private final TokenService tokenService;
 
 
   @Operation(summary = "일반 로그인", description = "사용자 이름 또는 이메일과 비밀번호로 로그인합니다.")
@@ -61,17 +60,14 @@ public class AuthController {
 
   @Operation(summary = "로그아웃", description = "로그아웃 합니다.")
   @GetMapping("logout")
-  public void logout() {
+  public void logout(Authentication authentication) {
     // JwtAuthFilter에서 토큰 검증 후 SecurityContextHolder에 사용자 정보를 저장하고 있음
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    tokenUtil.deleteRedisTokensByUserName(authentication.getName());
+    tokenService.deleteRedisTokensByUserName(authentication.getName());
   }
 
   @Operation(summary = "access token 재발급", description = "access token을 재발급 합니다.")
   @PostMapping("token")
-  public CommonResponse<?> reissuedToken() {
-
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    return CommonResponse.success(new TokenResponseDTO(tokenUtil.createAccessToken(authentication.getName()),null));
+  public CommonResponse<?> reissuedToken(Authentication authentication) {
+    return CommonResponse.success(new TokenResponseDTO(tokenService.createAccessToken(authentication.getName()),null));
   }
 }

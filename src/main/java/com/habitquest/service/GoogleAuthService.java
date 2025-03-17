@@ -5,7 +5,6 @@ import com.habitquest.entity.User;
 import com.habitquest.repository.UserRepository;
 import com.habitquest.service.dto.SSOTokenInfoDTO;
 import com.habitquest.service.dto.TokenResponseDTO;
-import com.habitquest.util.TokenUtil;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -32,7 +31,7 @@ public class GoogleAuthService implements SSOAuth {
   public static final String AUTH_URL = "https://accounts.google.com/o/oauth2/auth";
   public static final String TOKEN_URL = "https://oauth2.googleapis.com/token";
 
-  private final TokenUtil tokenUtil;
+  private final TokenService tokenService;
   private final UserRepository userRepository;
   private final RedisTemplate<String, Object> redisTemplate;
 
@@ -50,7 +49,7 @@ public class GoogleAuthService implements SSOAuth {
     SSOTokenInfoDTO ssoTokens = getSSOTokenInfo(code);
 
     //id token payload 추출
-    Map<String, Object> payload = tokenUtil.getTokenPayloadClaim(ssoTokens.idToken());
+    Map<String, Object> payload = tokenService.getTokenPayloadClaim(ssoTokens.idToken());
     String email = (String) payload.get("email");
     String name = (String) payload.get("name");
 
@@ -74,8 +73,8 @@ public class GoogleAuthService implements SSOAuth {
     redisTemplate.opsForValue().set(accessTokenKey, ssoTokens.accessToken(), ssoTokens.expiresIn(), TimeUnit.SECONDS);
 
     // habitquest에서 사용할 access, refresh token 발급
-    String accessToken = tokenUtil.createAccessToken(name);
-    String refreshToken = tokenUtil.createRefreshToken(name);
+    String accessToken = tokenService.createAccessToken(name);
+    String refreshToken = tokenService.createRefreshToken(name);
 
     return new TokenResponseDTO(accessToken,refreshToken);
   }

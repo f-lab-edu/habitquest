@@ -18,7 +18,8 @@ public enum ErrorType {
   PASSWORD_NOT_EQUAL("110001", HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
   USERNAME_CONFLICT("110002", HttpStatus.CONFLICT, "이미 사용 중인 사용자 이름입니다."),
   EMAIL_CONFLICT("110003", HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다."),
-  USER_UNAUTHORIZED("110004", HttpStatus.UNAUTHORIZED, "인증에 실패하여 요청이 거부되었습니다.");
+  USER_UNAUTHORIZED("110004", HttpStatus.UNAUTHORIZED, "인증에 실패하여 요청이 거부되었습니다."),
+  UNKNOWN_ERROR("120001", HttpStatus.INTERNAL_SERVER_ERROR, "예기치 않은 오류가 발생하였습니다.");
 
   ErrorType(String code, HttpStatus httpStatus, String message) {
     this.code = code;

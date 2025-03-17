@@ -1,4 +1,4 @@
-package com.habitquest.util;
+package com.habitquest.service;
 
 import com.habitquest.common.ErrorType;
 import com.habitquest.config.ObjectMapperConfig;
@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class TokenUtil {
+public class TokenService {
   @Value("${jwt.secret-key}")
   private String secretKey;
   @Value("${jwt.expire-milliseconds}")
@@ -33,6 +33,8 @@ public class TokenUtil {
   private long refreshExpireMilliseconds;
   private final RedisTemplate<String, Object> redisTemplate;
   private final ObjectMapperConfig objectMapper;
+  public static String accessTokenKey = "jwt:access:";
+  public static String refreshTokenKey = "jwt:refresh:";
 
   // secretKey를 HMAC SHA 알고리즘에 맞는 Key 객체로 변환하는 메서드
   private SecretKey getSigningKey() {
@@ -40,9 +42,6 @@ public class TokenUtil {
   }
 
   public String createAccessToken(String userName) {
-    // redis 저장시 사용할 key 정의
-    String accessTokenKey = "jwt:access:" + userName;
-
     // JWT 생성
     String accessToken = Jwts.builder()
         .subject(userName)
@@ -53,26 +52,23 @@ public class TokenUtil {
 
     // redis 저장
     log.info("user access token redis save start...{}", userName);
-    redisTemplate.opsForValue().set(accessTokenKey, accessToken, expireMilliseconds, TimeUnit.MILLISECONDS);
+    redisTemplate.opsForValue().set(accessTokenKey + userName, accessToken, expireMilliseconds, TimeUnit.MILLISECONDS);
 
     return accessToken;
   }
 
   public String createRefreshToken(String userName) {
-    // redis 저장시 사용할 key 정의
-    String refreshTokenKey = "jwt:refresh:" + userName;
-
     // JWT 생성
     String refreshToken = Jwts.builder()
         .subject(userName)
         .issuedAt(new Date())
-        .expiration(new Date(System.currentTimeMillis() + refreshExpireMilliseconds)) // 1일 유효
+        .expiration(new Date(System.currentTimeMillis() + refreshExpireMilliseconds))
         .signWith(getSigningKey())
         .compact();
 
     // redis 저장
     log.info("user refresh token redis save start...{}", userName);
-    redisTemplate.opsForValue().set(refreshTokenKey, refreshToken, refreshExpireMilliseconds, TimeUnit.MILLISECONDS);
+    redisTemplate.opsForValue().set(refreshTokenKey + userName, refreshToken, refreshExpireMilliseconds, TimeUnit.MILLISECONDS);
     return refreshToken;
   }
 
@@ -104,26 +100,7 @@ public class TokenUtil {
 
   public void deleteRedisTokensByUserName(String userName) {
     log.info("redis user token delete start ....user : {}", userName);
-    // Redis ScanOptions 설정 (패턴 매칭)
-    ScanOptions scanOptions = ScanOptions.scanOptions()
-        .match("*:" + userName) // userName이 포함된 키 검색
-        .count(100) // 한 번에 100개씩 검색 (튜닝 가능)
-        .build();
-
-    List<String> keysToDelete = new ArrayList<>();
-
-    /*
-     scanoption으로 가져올시, scan으로 조회된 키 리스트를 하나씩 반환해주는 cursor를 통해, keysToDelete에 하나씩 저장한다.
-     cursor는 scan 조회 키 리스트를 하나씩 가르키는 포인터 역할을 한다.
-     */
-    try (Cursor<String> cursor = redisTemplate.scan(scanOptions)) {
-      while (cursor.hasNext()) {
-        keysToDelete.add(cursor.next());
-      }
-    }
-    if (!keysToDelete.isEmpty()) {
-      redisTemplate.delete(keysToDelete);
-      log.info("redis user token delete end ....user : {}", userName);
-    }
+    redisTemplate.delete(accessTokenKey + userName);
+    redisTemplate.delete(refreshTokenKey + userName);
   }
 }
