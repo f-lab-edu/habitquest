@@ -16,7 +16,7 @@ import lombok.NonNull;
 
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // jpa에서 프록시 객체 생성시 기본 생성자가 필요하지만, 외부에서 직접 호출 못하도록 제한하기 위함
 public class User {
   @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;

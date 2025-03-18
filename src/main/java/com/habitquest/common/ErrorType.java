@@ -19,7 +19,10 @@ public enum ErrorType {
   USERNAME_CONFLICT("110002", HttpStatus.CONFLICT, "이미 사용 중인 사용자 이름입니다."),
   EMAIL_CONFLICT("110003", HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다."),
   USER_UNAUTHORIZED("110004", HttpStatus.UNAUTHORIZED, "인증에 실패하여 요청이 거부되었습니다."),
-  UNKNOWN_ERROR("120001", HttpStatus.INTERNAL_SERVER_ERROR, "예기치 않은 오류가 발생하였습니다.");
+  REQUIRED_FIELD_EMPTY("110005", HttpStatus.BAD_REQUEST, "필수 입력값이 입력되지 않았습니다."),
+  UNKNOWN_ERROR("120001", HttpStatus.INTERNAL_SERVER_ERROR, "예기치 않은 오류가 발생하였습니다."),
+  NOT_FOUND("120002", HttpStatus.NOT_FOUND, "요청 결과를 찾을 수 없습니다.");
+
 
   ErrorType(String code, HttpStatus httpStatus, String message) {
     this.code = code;
