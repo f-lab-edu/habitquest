@@ -1,4 +1,4 @@
-name: Build and Push Docker Image
+name: Build and Push Docker Images
 
 on:
   push:
@@ -22,7 +22,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
-      - name: Run tests before build
+      - name: Run API tests
         run: ./gradlew :api:test
 
       - name: Set up Docker Buildx
@@ -34,10 +34,18 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and Push Docker image
+      - name: Build and Push API Docker Image
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./Dockerfile
+          file: ./api/Dockerfile
           push: true
           tags: jangjorim/habitquest-api:latest
+
+      - name: Build and Push Batch Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./batch/Dockerfile
+          push: true
+          tags: jangjorim/habitquest-batch:latest
