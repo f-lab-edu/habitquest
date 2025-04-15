@@ -1,0 +1,18 @@
+buildscript {
+    ext {
+        springBootVersion = '3.1.0'
+    }
+    repositories {
+        mavenCentral()
+    }
+
+}
+
+allprojects {
+    group = 'com.example'
+    version = '1.0.0'
+
+    repositories {
+        mavenCentral()
+    }
+}
